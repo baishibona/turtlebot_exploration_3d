@@ -252,7 +252,7 @@ int main(int argc, char **argv) {
             MIs.push_back(calc_MI(cur_tree, c.first, hits, before));
 
             if(MIs[idx_acq[0]] < MIs.back()) {
-                ROS_INFO("Bayesian win, at %dth iter, amount : %f", bay_itr, Mis.back()-MIs[idx_acq[0]]);
+                ROS_INFO("Bayesian win, at %dth iter, amount : %f", bay_itr, MIs.back()-MIs[idx_acq[0]]);
             }
         }
         
