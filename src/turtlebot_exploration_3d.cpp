@@ -40,11 +40,11 @@ int main(int argc, char **argv) {
 
 
     ros::Subscriber kinect_sub = nh.subscribe<sensor_msgs::PointCloud2>("/camera/depth_registered/points", 1, kinectCallbacks);// need to change##########
-    ros::Publisher GoalMarker_pub = nh.advertise<visualization_msgs::Marker>( "Goal_Marker", 1 );
-    ros::Publisher Candidates_pub = nh.advertise<visualization_msgs::MarkerArray>("Candidate_MIs", 1);
-    ros::Publisher Frontier_points_pub = nh.advertise<visualization_msgs::Marker>("Frontier_points", 1);
+    ros::Publisher GoalMarker_pub = nh.advertise<visualization_msgs::Marker>( "/Goal_Marker", 1 );
+    ros::Publisher Candidates_pub = nh.advertise<visualization_msgs::MarkerArray>("/Candidate_MIs", 1);
+    ros::Publisher Frontier_points_pub = nh.advertise<visualization_msgs::Marker>("/Frontier_points", 1);
     ros::Publisher pub_twist = nh.advertise<geometry_msgs::Twist>("/cmd_vel_mux/input/teleop", 1);
-    ros::Publisher Octomap_pub = nh.advertise<octomap_msgs::Octomap>("octomap_3d",1);
+    ros::Publisher Octomap_pub = nh.advertise<octomap_msgs::Octomap>("/octomap_3d",1);
 
 
     tf_listener = new tf::TransformListener();
@@ -209,17 +209,19 @@ int main(int argc, char **argv) {
         for (int bay_itr = 0; bay_itr < num_of_bay; bay_itr++) {
             //Initialize gp regression
             
-            MatrixXf gp_train_x(candidates.size(), 2), gp_train_label(candidates.size(), 1), gp_test_x(gp_test_poses.size(), 2);
+            MatrixXf gp_train_x(candidates.size(), 3), gp_train_label(candidates.size(), 1), gp_test_x(gp_test_poses.size(), 3);
 
             for (int i=0; i< candidates.size(); i++){
                 gp_train_x(i,0) = candidates[i].first.x();
                 gp_train_x(i,1) = candidates[i].first.y();
+                gp_train_x(i,2) = candidates[i].second.z();
                 gp_train_label(i) = MIs[i];
             }
 
             for (int i=0; i< gp_test_poses.size(); i++){
                 gp_test_x(i,0) = gp_test_poses[i].first.x();
                 gp_test_x(i,1) = gp_test_poses[i].first.y();
+                gp_test_x(i,2) = gp_test_poses[i].second.z();
             }
 
             // Perform GP regression
@@ -243,11 +245,15 @@ int main(int argc, char **argv) {
 
             // evaluate MI, add to the candidate
             auto c = gp_test_poses[idx_acq[0]];
-            Sensor_PrincipalAxis = point3d(1.0, 0.0, 0.0);
-            Sensor_PrincipalAxis.rotate_IP(c.second.roll(), c.second.pitch(), c.second.yaw() );
-            octomap::Pointcloud hits = castSensorRays(cur_tree, c.first, Sensor_PrincipalAxis);
+            // Sensor_PrincipalAxis = point3d(1.0, 0.0, 0.0);
+            // Sensor_PrincipalAxis.rotate_IP(c.second.roll(), c.second.pitch(), c.second.yaw() );
+            octomap::Pointcloud hits = castSensorRays(cur_tree, c.first, c.second);
             candidates.push_back(c);
             MIs.push_back(calc_MI(cur_tree, c.first, hits, before));
+
+            if(MIs[idx_acq[0]] < MIs.back()) {
+                ROS_INFO("Bayesian win, at %dth iter, amount : %f", bay_itr, Mis.back()-MIs[idx_acq[0]]);
+            }
         }
         
         end_mi_eva_secs = ros::Time::now().toSec();
