@@ -90,6 +90,15 @@ int main(int argc, char **argv) {
         // Take a Scan
         ros::spinOnce();
 
+        // prepare octomap msg
+        octomap_msgs::binaryMapToMsg(*cur_tree, msg_octomap);
+        msg_octomap.binary = 1;
+        msg_octomap.id = 1;
+        msg_octomap.resolution = octo_reso;
+        msg_octomap.header.frame_id = "/map";
+        msg_octomap.header.stamp = ros::Time::now();
+        Octomap_pub.publish(msg_octomap);
+
         // Rotate another 60 degrees
         twist_cmd.linear.x = twist_cmd.linear.y = twist_cmd.angular.z = 0;
         ros::Time start_turn = ros::Time::now();
@@ -258,7 +267,7 @@ int main(int argc, char **argv) {
             MIs.push_back(calc_MI(cur_tree, c.first, hits, before));
             gp_test_poses.erase(gp_test_poses.begin()+idx_acq[0]);
 
-            if(MIs.back() < max_mi_by_sample) {
+            if(MIs.back() > max_mi_by_sample) {
                 ROS_WARN("Bayesian win, at %dth iter, amount : %f", bay_itr, max_mi_by_sample - MIs.back());
             }
         }

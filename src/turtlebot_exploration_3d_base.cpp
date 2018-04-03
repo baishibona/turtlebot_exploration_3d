@@ -90,6 +90,15 @@ int main(int argc, char **argv) {
         // Take a Scan
         ros::spinOnce();
 
+        // prepare octomap msg
+        octomap_msgs::binaryMapToMsg(*cur_tree, msg_octomap);
+        msg_octomap.binary = 1;
+        msg_octomap.id = 1;
+        msg_octomap.resolution = octo_reso;
+        msg_octomap.header.frame_id = "/map";
+        msg_octomap.header.stamp = ros::Time::now();
+        Octomap_pub.publish(msg_octomap);
+
         // Rotate another 60 degrees
         twist_cmd.linear.x = twist_cmd.linear.y = twist_cmd.angular.z = 0;
         ros::Time start_turn = ros::Time::now();
