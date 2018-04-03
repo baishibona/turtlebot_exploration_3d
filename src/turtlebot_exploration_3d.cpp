@@ -198,6 +198,12 @@ int main(int argc, char **argv) {
             // {
             //     max_idx = i;
             // }
+
+            // update maximum MI by samples
+            if(MIs[i]>max_mi_by_sample) {
+                max_mi_by_sample = MIs[i];
+            }
+
         }
 
 
@@ -248,9 +254,10 @@ int main(int argc, char **argv) {
             octomap::Pointcloud hits = castSensorRays(cur_tree, c.first, c.second);
             candidates.push_back(c);
             MIs.push_back(calc_MI(cur_tree, c.first, hits, before));
+            gp_test_poses.erase(gp_test_poses.begin()+idx_acq[0]);
 
-            if(MIs[idx_acq[0]] < MIs.back()) {
-                ROS_WARN("Bayesian win, at %dth iter, amount : %f", bay_itr, MIs.back()-MIs[idx_acq[0]]);
+            if(MIs[idx_acq[0]] < max_mi_by_sample) {
+                ROS_WARN("Bayesian win, at %dth iter, amount : %f", bay_itr, max_mi_by_sample - MIs[idx_acq[0]]);
             }
         }
         
