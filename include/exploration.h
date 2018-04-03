@@ -23,7 +23,7 @@ typedef pcl::PointXYZ PointType;
 typedef pcl::PointCloud<pcl::PointXYZ> PointCloud;
 const double PI = 3.1415926;
 const double octo_reso = 0.1;
-const int num_of_samples = 24;
+// const int num_of_samples = 24;
 const int num_of_samples_eva = 15;
 const int num_of_bay = 3;
 

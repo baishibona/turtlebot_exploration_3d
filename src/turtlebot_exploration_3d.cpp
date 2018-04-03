@@ -39,7 +39,7 @@ int main(int argc, char **argv) {
     octomap_name_3d = buffer;
 
 
-    ros::Subscriber kinect_sub = nh.subscribe<sensor_msgs::PointCloud2>("/camera/depth_registered/points", 1, kinectCallbacks);// need to change##########
+    ros::Subscriber kinect_sub = nh.subscribe<sensor_msgs::PointCloud2>("/camera/depth/points", 1, kinectCallbacks);// need to change##########
     ros::Publisher GoalMarker_pub = nh.advertise<visualization_msgs::Marker>( "/Goal_Marker", 1 );
     ros::Publisher Candidates_pub = nh.advertise<visualization_msgs::MarkerArray>("/Candidate_MIs", 1);
     ros::Publisher Frontier_points_pub = nh.advertise<visualization_msgs::Marker>("/Frontier_points", 1);
@@ -156,7 +156,7 @@ int main(int argc, char **argv) {
         Frontier_points_cubelist.points.clear();           
 
         // Generate Candidates
-        vector<pair<point3d, point3d>> candidates = extractCandidateViewPoints(frontier_groups, kinect_orig, num_of_samples); 
+        vector<pair<point3d, point3d>> candidates = extractCandidateViewPoints(frontier_groups, kinect_orig, num_of_samples_eva); 
         std::random_shuffle(candidates.begin(),candidates.end()); // shuffle to select a subset
         vector<pair<point3d, point3d>> gp_test_poses = candidates;
         ROS_INFO("Candidate View Points: %lu Genereated, %d evaluating...", candidates.size(), num_of_samples_eva);
