@@ -156,11 +156,11 @@ int main(int argc, char **argv) {
         Frontier_points_cubelist.points.clear();           
 
         // Generate Candidates
-        vector<pair<point3d, point3d>> candidates = extractCandidateViewPoints(frontier_groups, kinect_orig, num_of_samples_eva); 
+        vector<pair<point3d, point3d>> candidates = extractCandidateViewPoints(frontier_groups, kinect_orig, 25); 
         std::random_shuffle(candidates.begin(),candidates.end()); // shuffle to select a subset
         vector<pair<point3d, point3d>> gp_test_poses = candidates;
         ROS_INFO("Candidate View Points: %lu Genereated, %d evaluating...", candidates.size(), num_of_samples_eva);
-        int temp_size = candidates.size()-3;
+        int temp_size = candidates.size()-num_of_bay;
         if (temp_size < 1) {
             ROS_ERROR("Very few candidates generated, finishing with exploration...");
             nh.shutdown();
