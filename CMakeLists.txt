@@ -64,9 +64,16 @@ add_library(navigation                      src/navigation_utils.cpp)
 
 ## Declare a cpp executable
 add_executable(turtlebot_exploration_3d     src/turtlebot_exploration_3d.cpp src/gpregressor.cpp  src/covMaterniso3.cpp)
+add_executable(base                         src/turtlebot_exploration_3d_base.cpp )
 
 
 target_link_libraries(turtlebot_exploration_3d
+  ${catkin_LIBRARIES}
+  ${OCTOMAP_LIBRARIES}
+  navigation
+)
+
+target_link_libraries(base
   ${catkin_LIBRARIES}
   ${OCTOMAP_LIBRARIES}
   navigation

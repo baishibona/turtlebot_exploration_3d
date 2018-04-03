@@ -22,7 +22,7 @@ using namespace std;
 
 
 int main(int argc, char **argv) {
-    ros::init(argc, argv, "turtlebot_exploration_3d");
+    ros::init(argc, argv, "turtlebot_exploration_3d_base");
     ros::NodeHandle nh;
 
     // Initialize time
@@ -31,11 +31,11 @@ int main(int argc, char **argv) {
     char buffer[80];
     time (&rawtime);
     timeinfo = localtime(&rawtime);
-    strftime(buffer,80,"Trajectory_%R_%S_%m%d_bay.txt",timeinfo);
+    strftime(buffer,80,"Trajectory_%R_%S_%m%d_da.txt",timeinfo);
     std::string logfilename(buffer);
     // std::cout << logfilename << endl;
 
-    strftime(buffer,80,"Octomap3D_%m%d_%R_%S.ot",timeinfo);
+    strftime(buffer,80,"Octomap3D_%m%d_%R_%S_da.ot",timeinfo);
     octomap_name_3d = buffer;
 
 
@@ -160,15 +160,10 @@ int main(int argc, char **argv) {
         std::random_shuffle(candidates.begin(),candidates.end()); // shuffle to select a subset
         vector<pair<point3d, point3d>> gp_test_poses = candidates;
         ROS_INFO("Candidate View Points: %lu Genereated, %d evaluating...", candidates.size(), num_of_samples_eva);
-        int temp_size = candidates.size()-num_of_bay;
-        if (temp_size < 1) {
-            ROS_ERROR("Very few candidates generated, finishing with exploration...");
-            nh.shutdown();
-            return 0;
-        }
+
 
         // Generate Testing poses
-        candidates.resize(min(num_of_samples_eva,temp_size));
+        candidates.resize(num_of_samples_eva);
         frontier_groups.clear();
 
         // Evaluate MI for every candidate view points
@@ -205,61 +200,6 @@ int main(int argc, char **argv) {
                 max_mi_by_sample = MIs[i];
             }
 
-        }
-
-
-        // Bayesian Optimization for actively selecting candidate
-        double train_time, test_time;
-        GPRegressor g(100, 3, 0.01);
-        for (int bay_itr = 0; bay_itr < num_of_bay; bay_itr++) {
-            //Initialize gp regression
-            
-            MatrixXf gp_train_x(candidates.size(), 3), gp_train_label(candidates.size(), 1), gp_test_x(gp_test_poses.size(), 3);
-
-            for (int i=0; i< candidates.size(); i++){
-                gp_train_x(i,0) = candidates[i].first.x();
-                gp_train_x(i,1) = candidates[i].first.y();
-                gp_train_x(i,2) = candidates[i].second.z();
-                gp_train_label(i) = MIs[i];
-            }
-
-            for (int i=0; i< gp_test_poses.size(); i++){
-                gp_test_x(i,0) = gp_test_poses[i].first.x();
-                gp_test_x(i,1) = gp_test_poses[i].first.y();
-                gp_test_x(i,2) = gp_test_poses[i].second.z();
-            }
-
-            // Perform GP regression
-            MatrixXf gp_mean_MI, gp_var_MI;
-            train_time = ros::Time::now().toSec();
-            g.train(gp_train_x, gp_train_label);
-            train_time = ros::Time::now().toSec() - train_time;
-
-            test_time = ros::Time::now().toSec();
-            g.test(gp_test_x, gp_mean_MI, gp_var_MI);
-            test_time = ros::Time::now().toSec() - test_time;
-            // ROS_INFO("GP: Train(%zd) took %f secs , Test(%zd) took %f secs", candidates.size(), train_time, gp_test_poses.size(), test_time);        
-
-            // Get Acquisition function
-            double beta = 2.4;
-            vector<double>  bay_acq_fun(gp_test_poses.size());
-            for (int i = 0; i < gp_test_poses.size(); i++) {
-                bay_acq_fun[i] = gp_mean_MI(i) + beta*gp_var_MI(i);
-            }
-            vector<int> idx_acq = sort_MIs(bay_acq_fun);
-
-            // evaluate MI, add to the candidate
-            auto c = gp_test_poses[idx_acq[0]];
-            // Sensor_PrincipalAxis = point3d(1.0, 0.0, 0.0);
-            // Sensor_PrincipalAxis.rotate_IP(c.second.roll(), c.second.pitch(), c.second.yaw() );
-            octomap::Pointcloud hits = castSensorRays(cur_tree, c.first, c.second);
-            candidates.push_back(c);
-            MIs.push_back(calc_MI(cur_tree, c.first, hits, before));
-            gp_test_poses.erase(gp_test_poses.begin()+idx_acq[0]);
-
-            if(MIs.back() < max_mi_by_sample) {
-                ROS_WARN("Bayesian win, at %dth iter, amount : %f", bay_itr, max_mi_by_sample - MIs.back());
-            }
         }
         
         end_mi_eva_secs = ros::Time::now().toSec();
@@ -379,7 +319,7 @@ int main(int argc, char **argv) {
 
                 // // Send out results to file.
                 explo_log_file.open(logfilename, std::ofstream::out | std::ofstream::app);
-                explo_log_file << "Bay Step ," << robot_step_counter << ", Current Entropy ," << countFreeVolume(cur_tree) << ", time, " << ros::Time::now().toSec() << endl;
+                explo_log_file << "DA Step ," << robot_step_counter << ", Current Entropy ," << countFreeVolume(cur_tree) << ", time, " << ros::Time::now().toSec() << endl;
                 explo_log_file.close();
 
             }
