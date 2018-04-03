@@ -56,6 +56,7 @@ int main(int argc, char **argv) {
     geometry_msgs::Twist twist_cmd;
 
     ros::Time now_marker = ros::Time::now();
+    double start_time_secs = ros::Time::now().toSec();
    
     // Initialize parameters 
     int max_idx = 0;
@@ -319,7 +320,7 @@ int main(int argc, char **argv) {
 
                 // // Send out results to file.
                 explo_log_file.open(logfilename, std::ofstream::out | std::ofstream::app);
-                explo_log_file << "DA Step ," << robot_step_counter << ", Current Entropy ," << countFreeVolume(cur_tree) << ", time, " << ros::Time::now().toSec() << endl;
+                explo_log_file << "DA Step ," << robot_step_counter << ", Current Entropy ," << countFreeVolume(cur_tree) << ", time, " << ros::Time::now().toSec() - start_time_secs << endl;
                 explo_log_file.close();
 
             }
