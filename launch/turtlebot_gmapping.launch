@@ -1,6 +1,6 @@
 <launch>
-<!--   <node pkg="hokuyo_node" type="hokuyo_node" name="hokuyo" />
- -->
+  <node pkg="hokuyo_node" type="hokuyo_node" name="hokuyo" />
+
   <include file="$(find turtlebot_bringup)/launch/3dsensor.launch">
   <!--  <arg name="rgb_processing" value="true" />
     <arg name="depth_registration" value="true" />
@@ -9,12 +9,12 @@
     
     <!-- We must specify an absolute topic name because if not it will be prefixed by "$(arg camera)".
          Probably is a bug in the nodelet manager: https://github.com/ros/nodelet_core/issues/7 --> 
-    <arg name="scan_topic" value="/scan_kinect" />
+    <!-- <arg name="scan_topic" value="/scan_kinect" /> -->
   </include>
 
   <node pkg="tf" type="static_transform_publisher" name="base_footprint_to_laser" args="0 0 0.35 0 0 0 base_footprint laser 50" />
   
-  <arg name="scan_topic"  default="scan_kinect" />
+  <arg name="scan_topic"  default="scan" />
   <arg name="base_frame"  default="base_footprint"/>
   <arg name="odom_frame"  default="odom"/>
 
@@ -34,15 +34,15 @@
     <param name="ogain" value="3.0"/>
     <param name="lskip" value="0"/>
     <param name="minimumScore" value="200"/>
-    <param name="srr" value="0.01"/>
-    <param name="srt" value="0.02"/>
-    <param name="str" value="0.01"/>
-    <param name="stt" value="0.02"/>
+    <param name="srr" value="0.1"/>
+    <param name="srt" value="0.2"/>
+    <param name="str" value="0.1"/>
+    <param name="stt" value="0.2"/>
     <param name="linearUpdate" value="0.5"/>
     <param name="angularUpdate" value="0.436"/>
     <param name="temporalUpdate" value="-1.0"/>
     <param name="resampleThreshold" value="0.5"/>
-    <param name="particles" value="80"/>
+    <param name="particles" value="50"/>
   <!--
     <param name="xmin" value="-50.0"/>
     <param name="ymin" value="-50.0"/>
