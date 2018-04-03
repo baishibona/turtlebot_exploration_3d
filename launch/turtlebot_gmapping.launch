@@ -13,6 +13,7 @@
   </include>
 
   <node pkg="tf" type="static_transform_publisher" name="base_footprint_to_laser" args="0 0 0.35 0 0 0 base_footprint laser 50" />
+  <node pkg="tf" type="static_transform_publisher" name="base_footprint_to_kinect" args="0 0 0.25 0 0 0 base_footprint laser 50" />
   
   <arg name="scan_topic"  default="scan" />
   <arg name="base_frame"  default="base_footprint"/>

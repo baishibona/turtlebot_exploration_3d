@@ -270,10 +270,10 @@ void kinectCallbacks( const sensor_msgs::PointCloud2ConstPtr& cloud2_msg ) {
     pcl::fromPCLPointCloud2(cloud2,*cloud_local);
     octomap::Pointcloud hits;
 
-    ros::Duration(0.07).sleep();
+    ros::Duration(0.2).sleep();
     while(!pcl_ros::transformPointCloud("/map", *cloud_local, *cloud, *tf_listener))
     {
-        ros::Duration(0.01).sleep();
+        ros::Duration(0.05).sleep();
     }
     // Insert points into octomap one by one...
     for (int i = 1; i< cloud->width; i++)
