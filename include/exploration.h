@@ -289,7 +289,7 @@ void kinectCallbacks( const sensor_msgs::PointCloud2ConstPtr& cloud2_msg ) {
     cur_tree->insertPointCloud(hits, kinect_orig, Kinect_360.max_range);
     
     cur_tree->write(octomap_name_3d);
-    ROS_INFO("Entropy(3d map) : %f", countFreeVolume(cur_tree));
+    // ROS_INFO("Entropy(3d map) : %f", countFreeVolume(cur_tree));
 
     delete cloud;
     delete cloud_local;

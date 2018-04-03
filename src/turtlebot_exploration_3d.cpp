@@ -31,8 +31,8 @@ int main(int argc, char **argv) {
     char buffer[80];
     time (&rawtime);
     timeinfo = localtime(&rawtime);
-    // strftime(buffer,80,"Trajectory_%R_%S_%m%d_DA.txt",timeinfo);
-    // std::string logfilename(buffer);
+    strftime(buffer,80,"Trajectory_%R_%S_%m%d_bay.txt",timeinfo);
+    std::string logfilename(buffer);
     // std::cout << logfilename << endl;
 
     strftime(buffer,80,"Octomap3D_%m%d_%R_%S.ot",timeinfo);
@@ -121,7 +121,7 @@ int main(int argc, char **argv) {
         }
 
         Frontier_points_cubelist.points.resize(o);
-        ROS_INFO("frontier points %ld", o);
+        // ROS_INFO("frontier points %ld", o);
         now_marker = ros::Time::now();
         Frontier_points_cubelist.header.frame_id = "map";
         Frontier_points_cubelist.header.stamp = now_marker;
@@ -150,7 +150,7 @@ int main(int argc, char **argv) {
             }
             t++;
         }
-        ROS_INFO("Publishing %ld frontier_groups", t);
+        // ROS_INFO("Publishing %ld frontier_groups", t);
         
         Frontier_points_pub.publish(Frontier_points_cubelist); //publish frontier_points
         Frontier_points_cubelist.points.clear();           
@@ -231,7 +231,7 @@ int main(int argc, char **argv) {
             test_time = ros::Time::now().toSec();
             g.test(gp_test_x, gp_mean_MI, gp_var_MI);
             test_time = ros::Time::now().toSec() - test_time;
-            ROS_INFO("GP: Train(%zd) took %f secs , Test(%zd) took %f secs", candidates.size(), train_time, gp_test_poses.size(), test_time);        
+            // ROS_INFO("GP: Train(%zd) took %f secs , Test(%zd) took %f secs", candidates.size(), train_time, gp_test_poses.size(), test_time);        
 
             // Get Acquisition function
             double beta = 2.4;
@@ -250,7 +250,7 @@ int main(int argc, char **argv) {
             MIs.push_back(calc_MI(cur_tree, c.first, hits, before));
 
             if(MIs[idx_acq[0]] < MIs.back()) {
-                ROS_INFO("Bayesian win, at %dth iter, amount : %f", bay_itr, MIs.back()-MIs[idx_acq[0]]);
+                ROS_WARN("Bayesian win, at %dth iter, amount : %f", bay_itr, MIs.back()-MIs[idx_acq[0]]);
             }
         }
         
@@ -310,7 +310,7 @@ int main(int argc, char **argv) {
             next_vp = point3d(candidates[idx_MI[idx_ptr]].first.x(),candidates[idx_MI[idx_ptr]].first.y(),candidates[idx_MI[idx_ptr]].first.z());
             Goal_heading.setRPY(0.0, 0.0, candidates[idx_MI[idx_ptr]].second.yaw());
             Goal_heading.normalize();
-            ROS_INFO("Max MI : %f , @ location: %3.2f  %3.2f  %3.2f", MIs[idx_MI[idx_ptr]], next_vp.x(), next_vp.y(), next_vp.z() );
+            // ROS_INFO("Max MI : %f , @ location: %3.2f  %3.2f  %3.2f", MIs[idx_MI[idx_ptr]], next_vp.x(), next_vp.y(), next_vp.z() );
             
             // Publish the goal as a Marker in rviz
             visualization_msgs::Marker marker;
@@ -329,7 +329,7 @@ int main(int argc, char **argv) {
             marker.pose.orientation.w = Goal_heading.w();
             marker.scale.x = 1.5;
             marker.scale.y = 0.3;
-            marker.scale.z = 1.0;
+            marker.scale.z = 0.3;
             marker.color.a = 1.0; // Don't forget to set the alpha!
             marker.color.r = 1.0;
             marker.color.g = 0.0;
@@ -367,12 +367,12 @@ int main(int argc, char **argv) {
                 msg_octomap.header.frame_id = "/map";
                 msg_octomap.header.stamp = ros::Time::now();
                 Octomap_pub.publish(msg_octomap);
-                ROS_INFO("Octomap updated in RVIZ");
+                // ROS_INFO("Octomap updated in RVIZ");
 
                 // // Send out results to file.
-                // explo_log_file.open(logfilename, std::ofstream::out | std::ofstream::app);
-                // explo_log_file << "DA Step ," << robot_step_counter << ", Current Entropy ," << countFreeVolume(cur_tree) << ", time, " << ros::Time::now().toSec() << endl;
-                // explo_log_file.close();
+                explo_log_file.open(logfilename, std::ofstream::out | std::ofstream::app);
+                explo_log_file << "Bay Step ," << robot_step_counter << ", Current Entropy ," << countFreeVolume(cur_tree) << ", time, " << ros::Time::now().toSec() << endl;
+                explo_log_file.close();
 
             }
             else
