@@ -27,7 +27,7 @@ bool goToDest(point3d go_posi, tf::Quaternion q) {
   goal.target_pose.pose.orientation.z = q.z();
   goal.target_pose.pose.orientation.w = q.w();
 
-  ROS_INFO("Sending robot to the next viewpoint...", go_posi.x(), go_posi.y(), go_posi.z());
+  ROS_INFO("Sending robot to the next viewpoint...");
   ac.sendGoal(goal);
 
   // while(ros::ok())
