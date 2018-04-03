@@ -197,7 +197,7 @@ vector<pair<point3d, point3d>> extractCandidateViewPoints(vector<vector<point3d>
 
         for(vector<vector<point3d>>::size_type u = 0; u < frontier_groups.size(); u++) {
             for(double yaw = 0; yaw < 2*PI; yaw += PI*2/n )
-                for(double R2 = R2_min; R2<=R2_max; R2+=1.0) { 
+                for(double R2 = R2_min; R2<=R2_max; R2+=0.3) { 
                 x = frontier_groups[u][0].x() - R2 * cos(yaw);
                 y = frontier_groups[u][0].y() - R2 * sin(yaw);
 
