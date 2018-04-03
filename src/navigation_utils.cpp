@@ -27,7 +27,7 @@ bool goToDest(point3d go_posi, tf::Quaternion q) {
   goal.target_pose.pose.orientation.z = q.z();
   goal.target_pose.pose.orientation.w = q.w();
 
-  ROS_INFO("Sending goal to (%3.2f, %3.2f, %3.2f), and wait for 120 seconds...", go_posi.x(), go_posi.y(), go_posi.z());
+  ROS_INFO("Sending robot to the next viewpoint...", go_posi.x(), go_posi.y(), go_posi.z());
   ac.sendGoal(goal);
 
   // while(ros::ok())
@@ -44,5 +44,9 @@ bool goToDest(point3d go_posi, tf::Quaternion q) {
 int main(int argc, char** argv){
   ros::init(argc, argv, "navigation_utils");
 
+  while(ros::ok()){
+    ros::spin();
+  }
+  
   return 0;
 }

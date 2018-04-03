@@ -63,9 +63,8 @@ int main(int argc, char **argv) {
     point3d Sensor_PrincipalAxis(1, 0, 0);
     octomap::OcTreeNode *n;
     octomap::OcTree new_tree(octo_reso);
-    octomap::OcTree new_tree_2d(octo_reso);
     cur_tree = &new_tree;
-    cur_tree_2d = &new_tree_2d;
+
     point3d next_vp;
 
     bool got_tf = false;
@@ -77,7 +76,7 @@ int main(int argc, char **argv) {
         got_tf = false;
         while(!got_tf){
         try{
-            tf_listener->lookupTransform("/map", "/camera_rgb_frame", ros::Time(0), transform);// need to change tf of kinect###############
+            tf_listener->lookupTransform("/map", "/camera_rgb_frame", ros::Time(0), transform);   
             kinect_orig = point3d(transform.getOrigin().x(), transform.getOrigin().y(), transform.getOrigin().z());
             got_tf = true;
         }
@@ -95,8 +94,8 @@ int main(int argc, char **argv) {
         ros::Time start_turn = ros::Time::now();
 
         ROS_WARN("Rotate 60 degrees");
-        while (ros::Time::now() - start_turn < ros::Duration(2.6)){ // turning duration - second
-        twist_cmd.angular.z = 0.6; // turning speed
+        while (ros::Time::now() - start_turn < ros::Duration(2.6)){ 
+        twist_cmd.angular.z = 0.6; 
         // turning angle = turning speed * turning duration / 3.14 * 180
         pub_twist.publish(twist_cmd);
         ros::Duration(0.05).sleep();
@@ -109,6 +108,7 @@ int main(int argc, char **argv) {
 
     // steps robot taken, counter
     int robot_step_counter = 0;
+    double max_mi_by_sample = 0;
 
     while (ros::ok())
     {
@@ -142,12 +142,11 @@ int main(int argc, char **argv) {
         int l = 0;
         geometry_msgs::Point q;
         for(vector<vector<point3d>>::size_type n = 0; n < frontier_groups.size(); n++) { 
-            for(vector<point3d>::size_type m = 0; m < frontier_groups[n].size(); m++){
+            for(vector<point3d>::size_type m = 0; m < frontier_groups[n].size(); m++) {
                q.x = frontier_groups[n][m].x();
                q.y = frontier_groups[n][m].y();
                q.z = frontier_groups[n][m].z()+octo_reso;
                Frontier_points_cubelist.points.push_back(q); 
-               
             }
             t++;
         }
@@ -172,7 +171,7 @@ int main(int argc, char **argv) {
         candidates.resize(min(num_of_samples_eva,temp_size));
         frontier_groups.clear();
 
-// Evaluate MI for every candidate view points
+        // Evaluate MI for every candidate view points
         vector<double>  MIs(candidates.size());
         double before = countFreeVolume(cur_tree);
         // int max_idx = 0;
@@ -180,13 +179,12 @@ int main(int argc, char **argv) {
         begin_mi_eva_secs = ros::Time::now().toSec();
 
         #pragma omp parallel for
-        for(int i = 0; i < candidates.size(); i++) 
-        {
+        for(int i = 0; i < candidates.size(); i++) {
             auto c = candidates[i];
             // Evaluate Mutual Information
-            Sensor_PrincipalAxis = point3d(1.0, 0.0, 0.0);
-            Sensor_PrincipalAxis.rotate_IP(c.second.roll(), c.second.pitch(), c.second.yaw() );
-            octomap::Pointcloud hits = castSensorRays(cur_tree, c.first, Sensor_PrincipalAxis);
+            // Sensor_PrincipalAxis = point3d(1.0, 0.0, 0.0);
+            // Sensor_PrincipalAxis.rotate_IP(c.second.roll(), c.second.pitch(), c.second.yaw() );
+            octomap::Pointcloud hits = castSensorRays(cur_tree, c.first, c.second);
             
             // Considering pure MI for decision making
             // MIs[i] = calc_MI(cur_tree, c.first, hits, before);
