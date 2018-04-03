@@ -74,7 +74,7 @@ struct sensorModel {
         }
     }
 }; 
-sensorModel Kinect_360(64, 48, 2*PI*57/360, 2*PI*43/360, 6);    // Construct sensor model : Kinect
+sensorModel Kinect_360(128, 96, 2*PI*57/360, 2*PI*43/360, 6);    // Construct sensor model : Kinect
 
 
 double countFreeVolume(const octomap::OcTree *octree) {
