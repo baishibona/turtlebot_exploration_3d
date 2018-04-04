@@ -132,8 +132,8 @@ vector<vector<point3d>> extractFrontierPoints(const octomap::OcTree *octree) {
          y_cur = n.getY();
          z_cur = n.getZ();
 
-         // if(z_cur < 0.4)    continue;
-         // if(z_cur > 0.4 + octo_reso)    continue;
+         if(z_cur < 0.4)    continue;
+         if(z_cur > 0.4 + octo_reso)    continue;
          //if there are unknown around the cube, the cube is frontier
          for (double x_cur_buf = x_cur - octo_reso; x_cur_buf < x_cur + octo_reso; x_cur_buf += octo_reso)
              for (double y_cur_buf = y_cur - octo_reso; y_cur_buf < y_cur + octo_reso; y_cur_buf += octo_reso)
