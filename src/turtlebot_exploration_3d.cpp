@@ -77,7 +77,7 @@ int main(int argc, char **argv) {
         got_tf = false;
         while(!got_tf){
         try{
-            tf_listener->lookupTransform("/map", "/camera_rgb_frame", ros::Time(0), transform);   
+            tf_listener->lookupTransform("/map", "/camera_depth_frame", ros::Time(0), transform);   
             kinect_orig = point3d(transform.getOrigin().x(), transform.getOrigin().y(), transform.getOrigin().z());
             got_tf = true;
         }
@@ -268,7 +268,7 @@ int main(int argc, char **argv) {
             gp_test_poses.erase(gp_test_poses.begin()+idx_acq[0]);
 
             if(MIs.back() > max_mi_by_sample) {
-                ROS_WARN("Bayesian win, at %dth iter, amount : %f", bay_itr, max_mi_by_sample - MIs.back());
+                ROS_WARN("Bayesian win, at %dth iter, amount : %f", bay_itr, MIs.back() - max_mi_by_sample);
             }
         }
         
@@ -340,12 +340,12 @@ int main(int argc, char **argv) {
             marker.action = visualization_msgs::Marker::ADD;
             marker.pose.position.x = next_vp.x();
             marker.pose.position.y = next_vp.y();
-            marker.pose.position.z = 1.0;
+            marker.pose.position.z = 0.7;
             marker.pose.orientation.x = Goal_heading.x();
             marker.pose.orientation.y = Goal_heading.y();
             marker.pose.orientation.z = Goal_heading.z();
             marker.pose.orientation.w = Goal_heading.w();
-            marker.scale.x = 1.5;
+            marker.scale.x = 1.0;
             marker.scale.y = 0.3;
             marker.scale.z = 0.3;
             marker.color.a = 1.0; // Don't forget to set the alpha!
@@ -363,7 +363,7 @@ int main(int argc, char **argv) {
                 got_tf = false;
                 while(!got_tf){
                 try{
-                    tf_listener->lookupTransform("/map", "/camera_rgb_frame", ros::Time(0), transform);// need to change tf of kinect###############
+                    tf_listener->lookupTransform("/map", "/camera_depth_frame", ros::Time(0), transform);// need to change tf of kinect###############
                     kinect_orig = point3d(transform.getOrigin().x(), transform.getOrigin().y(), transform.getOrigin().z());
                     got_tf = true;
                 }
