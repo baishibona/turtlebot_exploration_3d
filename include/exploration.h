@@ -186,8 +186,8 @@ vector<vector<point3d>> extractFrontierPoints(const octomap::OcTree *octree) {
 //generate candidates for moving. Input sensor_orig and initial_yaw, Output candidates
 //senor_orig: locationg of sensor.   initial_yaw: yaw direction of sensor
 vector<pair<point3d, point3d>> extractCandidateViewPoints(vector<vector<point3d>> frontier_groups, point3d sensor_orig, int n ) {
-    double R2_min = 1.0;        // distance from candidate view point to frontier centers, in meters.
-    double R2_max = 5.0;
+    double R2_min = 0.5;        // distance from candidate view point to frontier centers, in meters.
+    double R2_max = 4.0;
     double R3 = 0.3;        // to other frontiers
 
     octomap::OcTreeNode *n_cur_3d;
@@ -197,7 +197,7 @@ vector<pair<point3d, point3d>> extractCandidateViewPoints(vector<vector<point3d>
 
         for(vector<vector<point3d>>::size_type u = 0; u < frontier_groups.size(); u++) {
             for(double yaw = 0; yaw < 2*PI; yaw += PI*2/n )
-                for(double R2 = R2_min; R2<=R2_max; R2+=0.3) { 
+                for(double R2 = R2_min; R2<=R2_max; R2+=0.2) { 
                 x = frontier_groups[u][0].x() - R2 * cos(yaw);
                 y = frontier_groups[u][0].y() - R2 * sin(yaw);
 
