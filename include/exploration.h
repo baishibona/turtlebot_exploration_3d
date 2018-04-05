@@ -104,7 +104,7 @@ octomap::Pointcloud castSensorRays(const octomap::OcTree *octree, const point3d 
         if(octree->castRay(position, RaysToCast.getPoint(i), end, true, Kinect_360.max_range)) {
             hits.push_back(end);  // hit a known obstacle
         } else {                  // not hit any obstacle
-            octree->castRay(position, RaysToCast.getPoint(i), end, false, Kinect_360.max_range)
+            octree->castRay(position, RaysToCast.getPoint(i), end, false, Kinect_360.max_range);
             float dist_2_unknown = dist_bt_points(position, end);
             end = RaysToCast.getPoint(i) * (dist_2_unknown + 2);
             end += position;
