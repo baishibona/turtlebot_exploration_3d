@@ -49,6 +49,10 @@ vector<int> sort_MIs(const vector<double> &v){
     return idx;
 }
 
+float dist_bt_points(point3d a, point3d b) {
+    return std::sqrt( pow((a.x()-b.x()),2) + pow((a.y()-b.y()),2) + pow((a.z()-b.z()),2) );
+}
+
 
 struct sensorModel {
     double horizontal_fov;
@@ -98,9 +102,11 @@ octomap::Pointcloud castSensorRays(const octomap::OcTree *octree, const point3d 
     // Cast Rays to 3d OctoTree and get hit points
     for(int i = 0; i < RaysToCast.size(); i++) {
         if(octree->castRay(position, RaysToCast.getPoint(i), end, true, Kinect_360.max_range)) {
-            hits.push_back(end);
-        } else {
-            end = RaysToCast.getPoint(i) * Kinect_360.max_range;
+            hits.push_back(end);  // hit a known obstacle
+        } else {                  // not hit any obstacle
+            octree->castRay(position, RaysToCast.getPoint(i), end, false, Kinect_360.max_range)
+            float dist_2_unknown = dist_bt_points(position, end);
+            end = RaysToCast.getPoint(i) * (dist_2_unknown + 2);
             end += position;
             hits.push_back(end);
         }
