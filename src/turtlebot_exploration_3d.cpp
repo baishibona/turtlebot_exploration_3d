@@ -198,11 +198,11 @@ int main(int argc, char **argv) {
             octomap::Pointcloud hits = castSensorRays(cur_tree, c.first, c.second);
             
             // Considering pure MI for decision making
-            // MIs[i] = calc_MI(cur_tree, c.first, hits, before);
+            MIs[i] = calc_MI(cur_tree, c.first, hits, before);
             
             // Normalize the MI with distance
-            MIs[i] = calc_MI(cur_tree, c.first, hits, before) / 
-                sqrt(pow(c.first.x()-kinect_orig.x(),2) + pow(c.first.y()-kinect_orig.y(),2));
+            // MIs[i] = calc_MI(cur_tree, c.first, hits, before) / 
+            //     sqrt(pow(c.first.x()-kinect_orig.x(),2) + pow(c.first.y()-kinect_orig.y(),2));
 
             // Pick the Candidate view point with max MI
             // if (MIs[i] > MIs[max_idx])
